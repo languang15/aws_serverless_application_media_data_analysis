@@ -1,0 +1,40 @@
+{
+    "version": "2.0",
+    "routeKey": "GET /detect",
+    "rawPath": "/detect",
+    "rawQueryString": "Image=5234115.jpg",
+    "headers": {
+      "accept": "*/*",
+      "accept-encoding": "gzip, deflate, br",
+      "content-length": "0",
+      "host": "20e4q279v0.execute-api.eu-west-2.amazonaws.com",
+      "postman-token": "388ca2b3-6f12-4619-981e-8b6fee862c9a",
+      "user-agent": "PostmanRuntime/7.28.4",
+      "x-amzn-trace-id": "Root=1-619683f5-63a111be565e8db53b2ad3eb",
+      "x-forwarded-for": "52.94.36.22",
+      "x-forwarded-port": "443",
+      "x-forwarded-proto": "https"
+    },
+    "queryStringParameters": {
+      "Image": "5234115.jpg"
+    },
+    "requestContext": {
+      "accountId": "988298946492",
+      "apiId": "20e4q279v0",
+      "domainName": "20e4q279v0.execute-api.eu-west-2.amazonaws.com",
+      "domainPrefix": "20e4q279v0",
+      "http": {
+        "method": "GET",
+        "path": "/detect",
+        "protocol": "HTTP/1.1",
+        "sourceIp": "52.94.36.22",
+        "userAgent": "PostmanRuntime/7.28.4"
+      },
+      "requestId": "JAmOaiq-LPEEMRQ=",
+      "routeKey": "GET /detect",
+      "stage": "$default",
+      "time": "18/Nov/2021:16:48:53 +0000",
+      "timeEpoch": 1637254133644
+    },
+    "isBase64Encoded": false
+  }

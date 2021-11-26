@@ -1,0 +1,219 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: S3 Upload and labels detection application and sentiment analysis
+
+Resources:
+  # HTTP API
+  LabelsDetetctionApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:   
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - POST
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - "*"   
+        AllowOrigins: 
+          - "*"      
+
+  ## Lambda functions 1
+  ImageUploadFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: uploadFunction/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+      MemorySize: 128
+      Environment:
+        Variables:
+          UploadBucket: !Ref S3ImageBucket  
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref S3ImageBucket
+      Events:
+        UploadApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /uploads
+            Method: get
+            ApiId: !Ref LabelsDetetctionApi  
+
+  #Lambda functions 2
+  ImageDetectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: This lambda function will be triggered based on api event and use Rekognition APIs to detect image labels in S3 Object and return the respose as json string.
+      CodeUri: detectFunction/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+      MemorySize: 128
+      Environment:
+        Variables:
+          UploadBucket: !Ref S3ImageBucket
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref S3ImageBucket
+        - RekognitionDetectOnlyPolicy: {}
+      Events:
+        DetecteApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /detect
+            Method: get
+            ApiId: !Ref LabelsDetetctionApi
+
+  #Lambda functions 3
+  TextAnalysisFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: This lambda function will be triggered based on api event and use Comprehend APIs to detect sentiment in text and return the respose as json string.
+      CodeUri: textAnalysisFunction/
+      Handler: app.handler
+      Runtime: nodejs12.x
+      Timeout: 3
+      MemorySize: 128
+      Policies:
+        - ComprehendBasicAccessPolicy: {}
+      Events:
+        DetecteApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /text
+            Method: post
+            ApiId: !Ref LabelsDetetctionApi
+
+
+
+  ## S3 bucket 1
+  S3ImageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3image-labelsdetection-lan-test
+      CorsConfiguration:
+        CorsRules:
+        - AllowedHeaders:
+            - "*"
+          AllowedMethods:
+            - GET
+            - PUT
+            - HEAD
+          AllowedOrigins:
+            - "*"
+
+  ## S3 bucket 2
+  S3WebUIBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      # Change bucket name to reflect your website
+      BucketName: s3webui-lan-test
+      CorsConfiguration:
+        CorsRules:
+        - AllowedHeaders:
+            - "*"
+          AllowedMethods:
+            - GET
+            - PUT
+            - POST
+            - HEAD
+          AllowedOrigins:
+            - "*"
+
+  S3WebUIBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3WebUIBucket
+      PolicyDocument:
+      # Restricting access to cloudfront only.
+        Statement:
+          -
+            Effect: Allow
+            Action: 's3:GetObject'
+            Resource:
+              - !Sub "arn:aws:s3:::${S3WebUIBucket}/*"
+            Principal:
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}"
+
+  CloudFrontOriginAccessIdentity:
+    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'Serverless website OA'
+
+  CloudFrontOriginAccessIdentity2:
+    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'Serverless website OA'
+
+  CloudfrontDistribution:
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        Comment: "Cloudfront distribution for serverless website"
+        DefaultRootObject: "index.html"
+        Enabled: true
+        HttpVersion: http2
+        # List of origins that Cloudfront will connect to
+        Origins:
+          - Id: s3-website
+            DomainName: !GetAtt S3WebUIBucket.DomainName
+            S3OriginConfig:
+              # Restricting Bucket access through an origin access identity
+              OriginAccessIdentity: 
+                Fn::Sub: 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+          - Id: s3-images
+            DomainName: !GetAtt S3ImageBucket.DomainName
+            S3OriginConfig:
+              # Restricting Bucket access through an origin access identity
+              OriginAccessIdentity: 
+                Fn::Sub: 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity2}'
+        # To connect the CDN to the origins you need to specify behaviours
+        DefaultCacheBehavior:
+          # Compress resources automatically ( gzip )
+          Compress: 'true'
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          ForwardedValues:
+            QueryString: false
+          TargetOriginId: s3-website
+          ViewerProtocolPolicy : redirect-to-https
+        CacheBehaviors:
+        - AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          TargetOriginId: s3-website
+          ForwardedValues:
+            QueryString: false
+          ViewerProtocolPolicy: allow-all
+          PathPattern: /index.html
+        - AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          TargetOriginId: s3-images
+          ForwardedValues:
+            QueryString: false  
+          ViewerProtocolPolicy: allow-all
+          PathPattern: /*      
+          
+
+
+## Take a note of the outputs for deploying the workflow templates in this sample application
+Outputs:
+  CloudfrontDistributionDomainName:
+    Description: "Cloudfront Distribution URL"
+    Value: !Sub 'https://${CloudfrontDistribution.DomainName}'
+  APIendpoint:
+    Description: "HTTP API endpoint URL"
+    Value: !Sub "https://${LabelsDetetctionApi}.execute-api.${AWS::Region}.amazonaws.com"
+  S3ImageBucketName:
+    Description: "S3 bucket for image uploads"
+    Value: !Ref 'S3ImageBucket'
+

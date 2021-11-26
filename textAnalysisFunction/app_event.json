@@ -1,0 +1,48 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /text",
+  "rawPath": "/text",
+  "rawQueryString": "text=Happy+weekend+morning+with+a+coffee",
+  "headers": {
+      "accept": "application/json, text/plain, */*",
+      "accept-encoding": "gzip, deflate, br",
+      "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
+      "content-length": "0",
+      "host": "20e4q279v0.execute-api.eu-west-2.amazonaws.com",
+      "origin": "http://d1kdnsls796x2s.cloudfront.net",
+      "referer": "http://d1kdnsls796x2s.cloudfront.net/",
+      "sec-ch-ua": "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": "\"macOS\"",
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "cross-site",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36",
+      "x-amzn-trace-id": "Root=1-61993874-438233a059e074ae2a8e0706",
+      "x-forwarded-for": "93.115.194.136",
+      "x-forwarded-port": "443",
+      "x-forwarded-proto": "https"
+  },
+  "queryStringParameters": {
+      "text": "Happy weekend morning with a coffee"
+  },
+  "requestContext": {
+      "accountId": "988298946492",
+      "apiId": "20e4q279v0",
+      "domainName": "20e4q279v0.execute-api.eu-west-2.amazonaws.com",
+      "domainPrefix": "20e4q279v0",
+      "http": {
+          "method": "POST",
+          "path": "/text",
+          "protocol": "HTTP/1.1",
+          "sourceIp": "93.115.194.136",
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
+      },
+      "requestId": "JHXCTgnPLPEEMxg=",
+      "routeKey": "POST /text",
+      "stage": "$default",
+      "time": "20/Nov/2021:18:03:32 +0000",
+      "timeEpoch": 1637431412936
+  },
+  "isBase64Encoded": false
+}

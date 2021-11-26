@@ -1,0 +1,14 @@
+{
+  "name": "media-posts-analysis",
+  "version": "1.0.0",
+  "description": "The application to recognize the labels of a uploaded image.",
+  "main": "index.js",
+  "scripts": {
+    "upload": "node -e \"console.log(require('./uploadFunction/app').handler({}));\"",
+    "detect": "node -e \"console.log(require('./detectFunction/app').handler({}));\""
+  },
+  "keywords": [],
+  "devDependencies": {
+    "aws-sdk": "^2.873.0"
+  }
+}
