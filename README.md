@@ -22,4 +22,7 @@ cd ..
 sam deploy --guided
 ```
 This command will be creating below set of components into your AWS using CloudFormation and should be carefull to consider your AWS billing limits.
-```
+
+
+## Architecture Diagram 
+<img src = "image/architecture.png">
