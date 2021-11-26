@@ -25,4 +25,7 @@ This command will be creating below set of components into your AWS using CloudF
 
 
 ## Architecture Diagram 
-<img src = "image/architecture.png">
+![GitHub Logo](/images/architecture.png)
+
+
+
